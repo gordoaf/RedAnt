@@ -1,0 +1,4 @@
+Third-party files, copied unchanged from the npm registry (sha512 integrity checked on download, 2026-11-19):
+  Readability.js          @mozilla/readability 0.6.0   Apache-2.0  (LICENSE-readability.md)
+  turndown.js             turndown 7.2.4 dist build    MIT         (LICENSE-turndown.txt)
+  turndown-plugin-gfm.js  turndown-plugin-gfm 1.0.2    MIT         (LICENSE-turndown-plugin-gfm.txt)

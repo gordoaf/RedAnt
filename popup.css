@@ -1,0 +1,86 @@
+:root {
+  --bg: #ffffff;
+  --fg: #1f2328;
+  --muted: #656d76;
+  --line: #d0d7de;
+  --box: #f6f8fa;
+  --accent: #c62828;
+  --accent-fg: #ffffff;
+  --ok: #1e8e3e;
+  --bad: #d93025;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1e1f22;
+    --fg: #e6e6e6;
+    --muted: #9aa0a6;
+    --line: #3c4043;
+    --box: #2a2b2e;
+    --accent: #e0574f;
+    --accent-fg: #ffffff;
+    --ok: #4cc26a;
+    --bad: #f28b82;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  width: 380px;
+  background: var(--bg);
+  color: var(--fg);
+  font: 13px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+}
+header .name { font-weight: 600; font-size: 14px; }
+header .ver { margin-left: auto; color: var(--muted); font-size: 11px; }
+main { padding: 12px 14px 14px; display: grid; gap: 10px; }
+.title { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.step { color: var(--muted); }
+body[data-status="done"] .step { color: var(--ok); }
+body[data-status="error"] .step { color: var(--bad); }
+.label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; }
+.path {
+  font: 12px/1.4 ui-monospace, Consolas, monospace;
+  background: var(--box);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 6px 8px;
+  word-break: break-all;
+  user-select: all;
+}
+.summary { color: var(--muted); margin-top: 4px; }
+.row { display: flex; gap: 8px; margin-top: 8px; }
+button {
+  font: inherit;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 6px 12px;
+  background: var(--accent);
+  color: var(--accent-fg);
+  cursor: pointer;
+}
+button.secondary { background: transparent; color: var(--fg); border-color: var(--line); }
+button.wide { width: 100%; }
+button:hover { filter: brightness(1.08); }
+.error {
+  color: var(--bad);
+  background: var(--box);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 8px;
+}
+details summary { color: var(--muted); cursor: pointer; font-size: 12px; }
+pre {
+  margin: 6px 0 0;
+  max-height: 160px;
+  overflow: auto;
+  font: 11px/1.4 ui-monospace, Consolas, monospace;
+  color: var(--muted);
+  white-space: pre-wrap;
+}

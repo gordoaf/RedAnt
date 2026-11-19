@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>RedAnt load check</title></head>
+<body>
+<!-- the popup's elements, so popup.js can run its first lines -->
+<span id="ver"></span><div id="title"></div><div id="step"></div><section id="result"></section><div id="path"></div>
+<div id="summary"></div><button id="copy"></button><button id="show"></button><div id="error"></div><button id="again"></button><pre id="log"></pre>
+<pre id="results">NOT RUN</pre>
+<script>
+  // Any error while loading (a typo, a bad import) lands here.
+  window.addEventListener('error', (e) => {
+    document.getElementById('results').textContent = `CRASH ${e.message} (${e.filename}:${e.lineno})\nSUMMARY pass=0 fail=1`;
+  });
+  // A stand-in for the chrome.* API: every property exists, every call resolves to undefined.
+  // Enough to prove each script parses, its imports resolve, and its startup code runs.
+  window.__calls = [];
+  const make = (path) => new Proxy(function () {}, {
+    get: (_t, key) => {
+      if (key === 'then') return undefined;
+      if (key === 'getManifest') return () => ({ version: '0.0.test' });
+      if (key === 'get' && path.endsWith('session')) return async () => ({});
+      if (key === 'query') return async () => [{ id: 7, url: 'https://example.com/' }];
+      return make(path + '.' + String(key));
+    },
+    apply: () => { window.__calls.push(path); return Promise.resolve(undefined); },
+  });
+  Object.defineProperty(window, 'chrome', { value: make('chrome'), configurable: true, writable: true });
+</script>
+<script type="module" src="smoke.js"></script>
+</body>
+</html>

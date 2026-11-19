@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Fake new-Reddit page</title></head>
+<body>
+<shreddit-post post-title="My week of copy trading" author="op1" subreddit-prefixed-name="r/Daytrading" score="1234"
+  comment-count="45" created-timestamp="2026-11-18T14:03:00.000+0000" content-href="https://www.reddit.com/r/Daytrading/comments/zz/x/">
+  <div slot="text-body"><p>First paragraph.</p><p>Second paragraph.</p></div>
+  <div slot="post-media-container">
+    <img src="https://preview.redd.it/a-v0-aaa111.png?width=320&amp;s=1" srcset="https://preview.redd.it/a-v0-aaa111.png?width=320&amp;s=1 320w, https://preview.redd.it/a-v0-aaa111.png?width=1080&amp;s=2 1080w">
+    <img src="https://styles.redditmedia.com/t5_x/communityIcon_abc.png">
+  </div>
+</shreddit-post>
+<shreddit-comment thingid="t1_k1" parentid="t3_zz" depth="0" author="skeptic" score="88">
+  <faceplate-timeago ts="2026-11-18T15:00:00.000Z">1h</faceplate-timeago>
+  <div slot="comment"><p>Show the full history.</p></div>
+  <shreddit-comment thingid="t1_k1a" parentid="t1_k1" depth="1" author="op1" score="12">
+    <faceplate-timeago ts="2026-11-18T15:30:00.000Z">30m</faceplate-timeago>
+    <div slot="comment"><p>Here it is</p><img src="https://i.redd.it/bbb222.png"><img src="https://i.redd.it/snoovatar/avatars/x.png"></div>
+  </shreddit-comment>
+</shreddit-comment>
+<shreddit-comment thingid="t1_k2" parentid="t3_zz" depth="0" author="" score="">
+  <div slot="comment"><p>[deleted]</p></div>
+</shreddit-comment>
+<script type="module">
+  import { scrapeRedditDom } from '../lib/inject.js';
+  const lines = [];
+  let pass = 0, fail = 0;
+  const check = (name, cond, detail = '') => { if (cond) { pass++; lines.push('PASS ' + name); } else { fail++; lines.push('FAIL ' + name + (detail ? ' :: ' + detail : '')); } };
+  try {
+    const r = scrapeRedditDom();
+    check('post facts', r.title === 'My week of copy trading' && r.author === 'op1' && r.subreddit === 'r/Daytrading' && r.score === '1234' && r.comments === '45', JSON.stringify(r));
+    check('post text', r.body.includes('First paragraph.') && r.body.includes('Second paragraph.'), r.body);
+    check('post picture: largest, no community icon', r.images.length === 1 && r.images[0].includes('width=1080'), JSON.stringify(r.images));
+    check('3 comments with depth', r.commentsList.length === 3 && r.commentsList.map((c) => c.depth).join() === '0,1,0', JSON.stringify(r.commentsList));
+    const k1 = r.commentsList[0], k1a = r.commentsList[1], k2 = r.commentsList[2];
+    check('comment body is its own, not its reply', k1.body === 'Show the full history.', k1.body);
+    check('comment fields', k1.author === 'skeptic' && k1.score === '88' && k1.created === '2026-11-18T15:00:00.000Z' && k1.id === 't1_k1');
+    check('reply picture, avatar skipped', k1a.images.length === 1 && k1a.images[0] === 'https://i.redd.it/bbb222.png', JSON.stringify(k1a.images));
+    check('deleted author', k2.author === '[deleted]');
+    document.body.innerHTML = '';
+    check('no post -> null', scrapeRedditDom() === null);
+  } catch (e) {
+    fail++; lines.push('CRASH ' + (e && e.stack ? e.stack : e));
+  }
+  lines.push(`SUMMARY pass=${pass} fail=${fail}`);
+  const out = document.createElement('pre'); out.id = 'results'; out.textContent = lines.join('\n');
+  document.body.append(out);
+</script>
+</body>
+</html>

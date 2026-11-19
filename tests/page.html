@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Copy trading: what the numbers say | Example News</title>
+<meta property="og:site_name" content="Example News">
+<meta name="author" content="Jane Writer">
+<meta property="article:published_time" content="2026-11-18T09:00:00Z">
+</head>
+<body>
+<header class="site-header">
+  <nav><a href="/">Home</a> <a href="/markets">Markets</a> <a href="/crypto">Crypto</a> <a href="/login">Log in</a>
+    <img src="https://example.com/logo.png" width="16" height="16" alt="logo"></nav>
+</header>
+<aside class="sidebar"><h3>Trending</h3><ul><li><a href="/a">Sidebar link one</a></li><li><a href="/b">Sidebar link two</a></li></ul></aside>
+<main>
+  <article id="story">
+    <h1>Copy trading: what the numbers say</h1>
+    <p class="byline">By Jane Writer</p>
+    <p>Copy trading lets one account mirror another account's trades automatically. Promoters often show a single great week, but a single week says very little about whether the leader has a real, repeatable edge or simply took a large risk that happened to pay off.</p>
+    <p>When we looked at a sample of leaders, most of the headline gains came from a handful of trades. The median follower did worse than the leader because of delay, slippage and fees, which add up quickly when positions are opened and closed many times a day.</p>
+    <figure>
+      <img src="https://example.com/chart-small.png" srcset="https://example.com/chart-small.png 400w, https://example.com/chart-big.png 1600w" width="800" height="450" alt="Leader vs follower returns">
+      <figcaption>Leader returns against follower returns over twelve weeks.</figcaption>
+    </figure>
+    <h2>The key table</h2>
+    <table>
+      <thead><tr><th>Group</th><th>Median weekly return</th></tr></thead>
+      <tbody><tr><td>Leaders</td><td>4.1%</td></tr><tr><td>Followers</td><td>-0.6%</td></tr></tbody>
+    </table>
+    <ul><li>Delay costs money.</li><li>Fees compound.</li></ul>
+    <pre><code>follower_return = leader_return - delay_cost - fees</code></pre>
+    <p>Before copying anyone, look at months of history, not one screenshot, and check how much of the result came from the single best trade.</p>
+    <iframe src="https://www.youtube.com/embed/abc123" width="560" height="315"></iframe>
+  </article>
+</main>
+<footer><p>Copyright Example News. <a href="/privacy">Privacy</a> <a href="/terms">Terms</a></p></footer>
+
+<script src="../vendor/Readability.js"></script>
+<script src="../vendor/turndown.js"></script>
+<script src="../vendor/turndown-plugin-gfm.js"></script>
+<script type="module">
+  import { extractPage } from '../lib/inject.js';
+  const lines = [];
+  let pass = 0, fail = 0;
+  const check = (name, cond, detail = '') => { if (cond) { pass++; lines.push('PASS ' + name); } else { fail++; lines.push('FAIL ' + name + (detail ? ' :: ' + detail : '')); } };
+  let r = null;
+  try {
+    if (location.hash === '#short') document.getElementById('story').remove();
+    r = extractPage();
+    if (location.hash === '#short') {
+      check('short page falls back to full text', r.mode === 'fulltext', r.mode);
+      check('full text includes the nav words', r.markdown.includes('Home') && r.markdown.includes('Copyright'), r.markdown);
+    } else {
+      check('reader mode', r.mode === 'reader', r.mode);
+      check('title', r.title === 'Copy trading: what the numbers say', r.title);
+      check('site + author + date', r.siteName === 'Example News' && /Jane Writer/.test(r.byline) && r.published.startsWith('2026-11-18'), JSON.stringify([r.siteName, r.byline, r.published]));
+      check('main text kept', r.markdown.includes('Copy trading lets one account mirror') && r.markdown.includes('single best trade'));
+      check('menus, sidebar, footer dropped', !r.markdown.includes('Log in') && !r.markdown.includes('Sidebar link') && !r.markdown.includes('Privacy'));
+      check('heading + list + code', r.markdown.includes('## The key table') && /^-\s+Delay costs money\./m.test(r.markdown) && r.markdown.includes('```'), r.markdown);
+      check('table as markdown', r.markdown.includes('| Group | Median weekly return |') && r.markdown.includes('| Followers | -0.6% |'), r.markdown);
+      check('one picture: the big srcset version, tiny logo skipped', r.images.length === 1 && /chart-big\.png$/.test(r.images[0].url) && r.images[0].alt === 'Leader vs follower returns', JSON.stringify(r.images));
+      check('picture placeholder in text', r.markdown.includes('![Leader vs follower returns](REDANT_IMG_0)'));
+      check('youtube embed listed', r.embeds.length === 1 && r.embeds[0] === 'https://www.youtube.com/embed/abc123', JSON.stringify(r.embeds));
+    }
+  } catch (e) {
+    fail++; lines.push('CRASH ' + (e && e.stack ? e.stack : e));
+  }
+  lines.push(`SUMMARY pass=${pass} fail=${fail}`);
+  const out = document.createElement('pre'); out.id = 'results'; out.textContent = lines.join('\n');
+  const sample = document.createElement('pre'); sample.id = 'sample'; sample.textContent = r ? r.markdown : '';
+  document.body.append(out, sample);
+</script>
+</body>
+</html>
